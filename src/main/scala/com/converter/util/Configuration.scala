@@ -5,6 +5,8 @@ import org.apache.spark.sql.functions.{column, explode}
 import org.apache.log4j.LogManager
 
 import scala.collection.mutable.ArrayBuffer
+import java.nio.file.{Files,Paths}
+import com.converter.exceptions.ConfigurationFileNotFoundException
 
 object Configuration{
 
@@ -18,6 +20,14 @@ object Configuration{
 
     def parseConfiguration(path: String): Unit ={
         val spark = SparkSession.builder().getOrCreate()
+        try{
+            if (! Files.exists(Paths.get(path))) throw new ConfigurationFileNotFoundException()
+        } catch {
+            case c: ConfigurationFileNotFoundException =>
+                LOGGER.error("ConfigurationFileNotFoundException : Program cannot find configuration file at the given location - provide correct path to a valid configuration file")
+                System.exit(-1)
+        }
+
         val configurationDF = spark.read.format("json").option("multiline", "true").load(path)
 
         val dataDF = configurationDF.select("inputFileFormat","inputDir","outputDir","outputFilename")
