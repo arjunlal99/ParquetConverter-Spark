@@ -26,6 +26,5 @@ class TsvParser extends Parser {
             .mode("overwrite")
             .save(Configuration.outputDir + "/" + Configuration.outputFilename)
 
-
     }
 }
