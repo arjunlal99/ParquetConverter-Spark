@@ -17,6 +17,7 @@ object Configuration{
     var outputDir: String = _
     var outputFilename: String = _
     var fields: ArrayBuffer[Field] = ArrayBuffer[Field]()
+    var lookup: Map[String, String] = Map() //lookup Map for column index to column name
 
     def parseConfiguration(path: String): Unit ={
         val spark = SparkSession.builder().getOrCreate()
@@ -43,7 +44,11 @@ object Configuration{
         for (field <- fieldsArray){
             val fieldInstance = Field(field(0).toString.toInt, field(1).toString, field(2).toString)
             this.fields.append(fieldInstance)
+            //add name to lookup map
+            this.lookup += ("_c" + fieldInstance.Index -> fieldInstance.Name)
         }
 
     }
+
+
 }
