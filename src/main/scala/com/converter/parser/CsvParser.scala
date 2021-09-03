@@ -10,7 +10,7 @@ class CsvParser extends Parser {
         val csvDF = spark.read
             .format("csv")
             .option("inferSchema", "true")
-            .load(Configuration.inputDir + "/*.csv")
+            .load(Configuration.inputDir + "/*")
 
         //sequence of required columns to be parsed from the log
         val columnSeq = Configuration.lookup.keys.toSeq.map(m => col(m))
