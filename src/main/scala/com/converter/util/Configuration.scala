@@ -1,11 +1,11 @@
 package com.converter.util
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{column, explode}
 import org.apache.log4j.LogManager
 
 import scala.collection.mutable.ArrayBuffer
-import java.nio.file.{Files,Paths}
+import java.nio.file.{Files, Paths}
 import com.converter.exceptions.ConfigurationFileNotFoundException
 
 object Configuration{
@@ -21,6 +21,13 @@ object Configuration{
 
     def parseConfiguration(path: String): Unit ={
         val spark = SparkSession.builder().getOrCreate()
+        checkConfigurationFileExists(path)
+        val configurationDF = spark.read.format("json").option("multiline", "true").load(path)
+        setProperties(spark, configurationDF)
+        setFields(spark, configurationDF)
+    }
+
+    def checkConfigurationFileExists(path: String): Unit ={
         try{
             if (! Files.exists(Paths.get(path))) throw new ConfigurationFileNotFoundException()
         } catch {
@@ -28,16 +35,18 @@ object Configuration{
                 LOGGER.error("ConfigurationFileNotFoundException : Program cannot find configuration file at the given location - provide correct path to a valid configuration file")
                 System.exit(-1)
         }
+    }
 
-        val configurationDF = spark.read.format("json").option("multiline", "true").load(path)
-
+    def setProperties(spark: SparkSession, configurationDF: DataFrame): Unit ={
         val dataDF = configurationDF.select("inputFileFormat","inputDir","outputDir","outputFilename")
         val dataArray = dataDF.collect()(0)
         this.inputFileFormat = dataArray(0).toString
         this.inputDir = dataArray(1).toString
         this.outputDir = dataArray(2).toString
         this.outputFilename = dataArray(3).toString
+    }
 
+    def setFields(spark: SparkSession, configurationDF: DataFrame): Unit ={
         val fieldsDF = configurationDF.select(explode(column("fields")) as "fields").select("fields.*")
         val fieldsArray = fieldsDF.collect()
 
@@ -47,7 +56,6 @@ object Configuration{
             //add name to lookup map
             this.lookup += ("_c" + fieldInstance.Index -> fieldInstance.Name)
         }
-
     }
 
 
