@@ -1,3 +1,8 @@
 package com.converter.exceptions
 
-class ConfigurationFileNotFoundException(val msg: String = "") extends Exception(msg){}
+
+class ConfigurationFileNotFoundException(val msg: String = "") extends Exception(msg){
+
+
+
+}

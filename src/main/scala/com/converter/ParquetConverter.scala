@@ -12,13 +12,8 @@ object ParquetConverter {
 
     def main(args: Array[String]): Unit ={
         val spark = SparkSession.builder.appName("Parquet Converter").getOrCreate()
-        try{
-            if (args.length == 0) throw new ExpectedArgumentNotFoundException()
-        } catch {
-            case c: ExpectedArgumentNotFoundException =>
-                LOGGER.error("ExpectedArgumentNotFoundException : Path to configuration file expected as first argument - correct usage is spark-submit (`options`) <.jar file> </path/to/conf_file>")
-                System.exit(-1)
-        }
+
+        if (args.length == 0) throw new ExpectedArgumentNotFoundException("ExpectedArgumentNotFoundException : Path to configuration file expected as first argument - correct usage is spark-submit (`options`) <.jar file> </path/to/conf_file>")
 
         val path: String = args(0)
         Configuration.parseConfiguration(path)

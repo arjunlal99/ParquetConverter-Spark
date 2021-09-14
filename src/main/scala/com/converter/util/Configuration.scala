@@ -28,13 +28,8 @@ object Configuration{
     }
 
     def checkConfigurationFileExists(path: String): Unit ={
-        try{
-            if (! Files.exists(Paths.get(path))) throw new ConfigurationFileNotFoundException()
-        } catch {
-            case c: ConfigurationFileNotFoundException =>
-                LOGGER.error("ConfigurationFileNotFoundException : Program cannot find configuration file at the given location - provide correct path to a valid configuration file")
-                System.exit(-1)
-        }
+        if (! Files.exists(Paths.get(path)))
+            throw new ConfigurationFileNotFoundException("ConfigurationFileNotFoundException : Program cannot find configuration file at the given location - provide correct path to a valid configuration file")
     }
 
     def setProperties(spark: SparkSession, configurationDF: DataFrame): Unit ={
@@ -56,7 +51,7 @@ object Configuration{
             //add name to lookup map
             this.lookup += ("_c" + fieldInstance.Index -> fieldInstance.Name)
         }
-    }
 
+    }
 
 }

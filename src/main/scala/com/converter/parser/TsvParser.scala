@@ -27,4 +27,5 @@ class TsvParser extends Parser {
             .save(Configuration.outputDir + "/" + Configuration.outputFilename)
 
     }
+
 }
